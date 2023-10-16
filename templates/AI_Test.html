@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Script Interface</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        /* CSS animation for the message container */
+        @keyframes running-animation {
+            0% { opacity: 0; }
+            25% { opacity: 1; }
+            75% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .running-message {
+            animation: running-animation 2s infinite;
+            display: none; /* Initially hidden */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Script Interface</h1>
+    <form id="ai-form">
+        <label for="transcription">Enter your content here:</label>
+        <textarea id="transcription" rows="4" cols="50"></textarea>
+        <br>
+        <button type="button" id="run-button">Run Script</button>
+    </form>
+    <!-- Message container for the animation -->
+    <div class="running-message">⚙️ App is running... ⚙️</div>
+    <div id="results">
+        <!-- Results from the script will be displayed here -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("run-button").addEventListener("click", function () {
+                // Show the animation
+                var runningMessage = document.querySelector(".running-message");
+                runningMessage.style.display = "block";
+                
+                var transcription = document.getElementById("transcription").value;
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/run-script", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        // Display results on the page
+                        document.getElementById("results").innerHTML = `
+                            <p>Meeting Summary: ${response.meeting_summary}</p>
+                            <p>Analysis Document: ${response.analysis}</p>
+                            <p>Next Step Ideas: ${response.next_step_ideas}</p>
+                            <p>Safty Score: ${response.predicted_score}</p>
+                        `;
+                        
+                        // Hide the animation after results are displayed
+                        runningMessage.style.display = "none";
+                    }
+                };
+                xhr.send("transcription=" + transcription);
+            });
+        });
+    </script>
+</body>
+</html>

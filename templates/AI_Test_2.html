@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReportGenius AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        body {
+            background-color: #0078d4;
+            font-family: "Arial", sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('your-background-image.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-attachment: fixed; /* Parallax effect */
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            padding: 20px;
+        }
+
+        button {
+            background-color: #f0f0f0;
+            color: #0078d4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff6f61;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        @keyframes running-animation {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .running-message {
+            animation: running-animation 2s infinite;
+            display: none;
+            text-align: center;
+        }
+
+        /* Style for auto-resizing textarea */
+        textarea {
+            border: 1px solid #0078d4;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px; /* You can adjust the maximum width */
+        }
+
+        /* Style for the email input and "Send Email" button */
+        #email-container input[type="email"] {
+            margin-right: 10px; /* Add space between the email input and button */
+            padding: 5px;
+            border: 1px solid #0078d4;
+            border-radius: 5px;
+        }
+
+        #email-container button.send-email-button {
+            background-color: #f0f0f0;
+            color: #0078d4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 data-aos="fade-up">🚀 ReportGenius AI 🤖</h1>
+    <div id="ai-form" data-aos="fade-up">
+        <label for="transcription">Enter your awesome content here:</label>
+        <br>
+        <textarea id="transcription" rows="6" style="width: 400px;" data-aos="fade-up" style="border: 1px solid #0078d4;"></textarea>
+        <br>
+        <button type="button" id="run-button" data-aos="fade-up">Run the Magic Script</button>
+        <br>
+    </div>
+    <div class="running-message" data-aos="fade-up">🔮 Magic in Progress... ✨</div>
+    <div id="results" data-aos="fade-up">
+        <!-- Results from the script will be displayed here -->
+    </div>
+    <div id="email-container" data-aos="fade-up" style="position: absolute; top: 20px; right: 20px;">
+        <input type="email" id="userEmail" placeholder="Your email">
+        <button type="button" class="send-email-button" id="send-email-button">Send Email</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("run-button").addEventListener("click", function () {
+                var userEmail = document.getElementById("userEmail").value; // Get the user's email
+                var runningMessage = document.querySelector(".running-message");
+                var sendEmailButton = document.querySelector(".send-email-button"); // Get the Send Email button
+                runningMessage.style.display = "block";
+
+                var transcription = document.getElementById("transcription").value;
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/run-script", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+
+                        // Determine the number of stars based on the predicted score
+                        var stars = '';
+                        switch (response.predicted_score) {
+                            case 1:
+                                stars = '⭐';
+                                break;
+                            case 2:
+                                stars = '⭐⭐';
+                                break;
+                            case 3:
+                                stars = '⭐⭐⭐';
+                                break;
+                            case 4:
+                                stars = '⭐⭐⭐⭐';
+                                break;
+                            case 5:
+                                stars = '⭐⭐⭐⭐⭐';
+                                break;
+                            default:
+                                stars = 'Not rated';
+                        }
+
+                        document.getElementById("results").innerHTML = `
+                            <p>🧙‍♂️ Analysis: ${response.analysis}</p>
+                            <p>💡 Next Steps: ${response.next_step_ideas}</p>
+                            <p>⚠️ Safety Score: ${stars}</p>
+                        `;
+
+                        runningMessage.style.display = "none";
+
+                        // Show the Send Email button
+                        var sendEmailButton = document.querySelector(".send-email-button");
+                        sendEmailButton.style.display = "block";
+                    }
+                };
+
+              // Send the transcription and user's email to the server
+            var formData = "transcription=" + transcription + "&userEmail=" + userEmail;
+            xhr.send(formData);
+        });
+
+        document.getElementById("transcription").addEventListener("input", function () {
+            document.getElementById("char-count").textContent = this.value.length + " characters";
+        });
+
+        document.getElementById("send-email-button").addEventListener("click", function () {
+            var userEmail = document.getElementById("userEmail").value; // Get the user's email
+
+            // Send the user's email to the server for email sending
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/send-email", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.message); // Show a success message
+                    } else {
+                        var error = JSON.parse(xhr.responseText);
+                        alert("Error: " + error.error); // Show an error message
+                    }
+                }
+            };
+
+            // Send the user's email to the server
+            var formData = "userEmail=" + userEmail;
+            xhr.send(formData);
+        });
+    });
+</script>
+</body>
+</html>
