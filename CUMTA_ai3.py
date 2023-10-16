@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = 'jszqtktzsbqgbnbl'  # Replace with your secret key
 Session(app)
 
 # Define your OpenAI API key
-api_key = "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"
+api_key = ${{ secrets.CUMTA_AI_KEY }}
 openai.api_key = api_key
 
 @app.route('/')
