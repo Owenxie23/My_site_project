@@ -18,12 +18,13 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
+load_dotenv()
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose a different session type if needed
 app.config['SECRET_KEY'] = 'jszqtktzsbqgbnbl'  # Replace with your secret key
 Session(app)
 
 # Define your OpenAI API key
-api_key = os.getenv(cumta_ai)
+api_key = os.getenv("cumta_ai")
 openai.api_key = api_key
 
 @app.route('/')
