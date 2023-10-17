@@ -14,6 +14,7 @@ import datetime
 from flask_cors import CORS
 import json
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
