@@ -14,9 +14,11 @@ import datetime
 from flask_cors import CORS
 import json
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
+load_dotenv()
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose a different session type if needed
 app.config['SECRET_KEY'] = 'jszqtktzsbqgbnbl'  # Replace with your secret key
 Session(app)
